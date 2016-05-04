@@ -488,6 +488,17 @@ class Client():
         :returns: True if the operation succeeded, False otherwise
         :raises: HTTPResponseError in case an HTTP error status was returned
         """
+
+        # For big files chunck them.
+        file_handle = open(local_source_file, 'r', 8192)
+        file_handle.seek(0, os.SEEK_END)
+        size = file_handle.tell()
+        file_handle.seek(0)
+        if size > 1879048192:
+            kwargs['chunked']=True
+        else:
+            kwargs['chunked']=False
+
         if kwargs.get('chunked', True):
             return self.__put_file_chunked(
                 remote_path,
